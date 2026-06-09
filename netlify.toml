@@ -1,0 +1,4 @@
+# Cấu hình deploy cho Netlify — trang tĩnh, publish thẳng thư mục gốc, không cần build.
+[build]
+  publish = "."
+  command = ""
