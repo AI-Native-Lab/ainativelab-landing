@@ -1,4 +1,6 @@
-# Cấu hình deploy cho Netlify — trang tĩnh, publish thẳng thư mục gốc, không cần build.
+# Netlify config for the PRODUCTION site (ainativelab.org).
+# This site's base directory = repo root, so it reads THIS file and publishes live/.
+# The staging site uses base directory = staging/ and reads staging/netlify.toml instead.
 [build]
-  publish = "."
+  publish = "live"
   command = ""

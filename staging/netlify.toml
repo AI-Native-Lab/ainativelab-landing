@@ -1,0 +1,6 @@
+# Netlify config for the STAGING site.
+# Set that Netlify site's "base directory" to staging/ — Netlify then reads THIS file
+# and publishes this folder (publish = "." is relative to the base directory).
+[build]
+  publish = "."
+  command = ""
