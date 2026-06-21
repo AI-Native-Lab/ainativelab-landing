@@ -44,10 +44,13 @@ branch deploy on that single project:
 
 - **Branch deploy:** Site config → Build & deploy → Branches → "Let me add individual branches" →
   add `staging`. Netlify then serves it at `staging--ainativelab.netlify.app`.
-- **staging.ainativelab.org** (DNS is on Cloudflare, external to Netlify, so this needs two steps):
-  1. Netlify → Domain management → add domain alias `staging.ainativelab.org`.
-  2. Cloudflare → DNS → add CNAME `staging` → `staging--ainativelab.netlify.app` (DNS-only /
-     grey-cloud so Netlify can issue the TLS cert).
+- **staging.ainativelab.org** (DNS is Cloudflare; the apex is Cloudflare-**proxied**, so match it):
+  1. Netlify → Domain management → add domain alias `staging.ainativelab.org` (routes the host to
+     the staging branch deploy).
+  2. Cloudflare → DNS → CNAME `staging` → `staging--ainativelab.netlify.app`, **Proxied (orange)**.
+     Cloudflare's Universal SSL (`*.ainativelab.org`) serves the cert — same as the apex.
+     ⚠️ Do **not** use grey/DNS-only here: while the apex is Cloudflare-proxied, Netlify can't issue
+     a per-alias cert (the proxy breaks its TLS-ALPN challenge → 422), so a grey record gets no cert.
 - **Deploy Previews:** Build & deploy → Deploy Previews → "Any pull request…".
 
 The old separate `ainativelab-staging` project is retired — delete it once staging.ainativelab.org serves.
