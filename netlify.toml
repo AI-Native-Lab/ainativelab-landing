@@ -1,6 +1,7 @@
-# Netlify config for the PRODUCTION site (ainativelab.org).
-# This site's base directory = repo root, so it reads THIS file and publishes live/.
-# The staging site uses base directory = staging/ and reads staging/netlify.toml instead.
+# Netlify config for ainativelab.org — one config, two environments by BRANCH.
+# Both Netlify sites use base directory = repo root and publish this folder.
+# Production site builds the `main` branch; the staging site builds the `staging` branch.
+# Every pull request also gets an isolated Deploy Preview — that is the review gate.
 [build]
-  publish = "live"
+  publish = "."
   command = ""

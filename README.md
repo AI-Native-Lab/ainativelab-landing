@@ -3,39 +3,43 @@
 The official linkhub for AI Native Lab. A single self-contained static page (HTML + inline CSS,
 Be Vietnam Pro font) — no build step, no external libraries.
 
-- **Production:** https://ainativelab.org  (Netlify site `inquisitive-sunburst-a83e04`)
-- **Staging:** the staging Netlify site (base directory = `staging/`)
+- **Production:** https://ainativelab.org  (Netlify site `inquisitive-sunburst-a83e04`, builds `main`)
+- **Staging:** the staging Netlify site (builds the `staging` branch)
 - **Domain/DNS:** Cloudflare → Netlify
 
-## Two environments, one repo
+## One source, environments by branch
 
 ```
 .
-├── netlify.toml      Production config — publish = "live" (read when base dir = repo root)
-├── live/
-│   └── index.html    PRODUCTION page → ainativelab.org. Produced by promote.sh — don't hand-edit.
-├── staging/
-│   ├── index.html    STAGING page — develop here
-│   └── netlify.toml  Staging config — publish = "." (read when a site's base dir = staging/)
-└── scripts/
-    └── promote.sh    Copy staging/ → live/ (excludes netlify.toml)
+├── index.html      THE page — edit this. No live/ or staging/ copies.
+└── netlify.toml    publish = "." — used by both Netlify sites (they differ by BRANCH).
 ```
 
-Each environment is a separate **Netlify site building the same repo**, distinguished by
-**base directory**: production uses the repo root (→ root `netlify.toml` → publishes `live/`),
-staging uses `staging/` (→ `staging/netlify.toml` → publishes `staging/`). This avoids the
-shared-config trap where one `netlify.toml` would force both sites to publish the same folder.
+There is **one copy** of the page. The two environments are git branches, not folders:
 
-## Workflow (develop → preview → approve → promote → ship)
+- `main` → production (**ainativelab.org**)
+- `staging` → the staging Netlify site (a persistent staging URL)
+- every **pull request** gets its own isolated **Deploy Preview** URL — this is the review gate
 
-1. **Develop** in `staging/index.html`. Push `main` → the staging site redeploys automatically.
-2. **Review** on the staging URL.
-3. **Approve.**
-4. **Promote:** `bash scripts/promote.sh --dry-run`, then `bash scripts/promote.sh`.
-5. **Ship:** `git add -A && git commit -m "promote staging -> live" && git push` → production redeploys.
+`main` is protected: no direct pushes; changes land only via a reviewed PR. Merging the PR *is*
+the promotion — there is no `promote.sh` and no second copy to keep in sync.
 
-## Set up the staging Netlify site (one-time)
+## Workflow (branch → preview → review → merge → live)
 
-In Netlify: **Add new site → Import from Git →** `AI-Native-Lab/ainativelab-landing`, then set
-**Base directory = `staging`** (leave publish/command to the committed `staging/netlify.toml`).
-Both sites deploy from `main`; they differ only by base directory.
+1. **Branch:** `git switch -c feat/my-change` off `main`. Edit `index.html`.
+2. **Preview:** push the branch and open a PR into `main`. Netlify posts a **Deploy Preview URL**
+   on the PR within a minute.
+3. **Review** on that preview URL.
+4. **Merge** the PR → `main` redeploys to **ainativelab.org**. Done.
+
+Want a longer soak before shipping? Merge into the `staging` branch first to see it on the staging
+Netlify site, then PR `staging` → `main` when happy.
+
+## Netlify setup (one-time)
+
+Both sites import `AI-Native-Lab/ainativelab-landing`, base directory = repo root (they read the
+committed `netlify.toml`). They differ only by **production branch**:
+
+- **Production site** `inquisitive-sunburst-a83e04`: production branch = `main`; Deploy Previews
+  enabled (Site config → Build & deploy → Deploy Previews → "Any pull request…").
+- **Staging site**: production branch = `staging`.
